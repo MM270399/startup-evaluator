@@ -1,15 +1,11 @@
 import streamlit as st
-import os
-from openai import OpenAI
-
-# Configura la chiave API di OpenAI
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    base_url="https://api.openai.com/v1",
-)
+from transformers import pipeline
 
 # Configura la pagina
 st.set_page_config(page_title="Valutatore Startup AI", layout="wide")
+
+# Inizializza il modello di Hugging Face
+generator = pipeline("text-generation", model="gpt2")
 
 # Titolo
 st.title("🤖 Valuta la tua idea di startup")
@@ -35,16 +31,10 @@ Rispondi in italiano con:
 - **Punti deboli**
 - **Potenziale di impatto**"""
 
-                # Chiamata all'API di OpenAI
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",  # Cambiato a gpt-3.5-turbo per maggiore accessibilità
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=500
-                )
-
-                # Estrai la risposta
-                valutazione = response.choices[0].message.content
+                # Genera la risposta
+                response = generator(prompt, max_length=500, num_return_sequences=1, truncation=True)
+                valutazione = response[0]["generated_text"]
                 st.markdown("### Risultato della valutazione:")
                 st.markdown(f"```text\n{valutazione}\n```")
             except Exception as e:
-                st.error(f"Errore durante la valutazione: {str(e)}. Verifica la tua API key o la connessione.")
+                st.error(f"Errore durante la valutazione: {str(e)}.")
