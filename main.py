@@ -1,30 +1,47 @@
 import streamlit as st
-import openai
 import os
+from openai import OpenAI
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Configura la chiave API di OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-st.set_page_config(page_title="Valutatore Startup AI")
+# Configura la pagina
+st.set_page_config(page_title="Valutatore Startup AI", layout="wide")
 
+# Titolo
 st.title("🤖 Valuta la tua idea di startup")
 
-idea = st.text_area("Scrivi qui la tua idea:")
+# Descrizione
+st.write("Inserisci la descrizione della tua idea di business e ottieni una valutazione dettagliata.")
 
+# Input dell'idea
+idea = st.text_area("Scrivi qui la tua idea di startup:", height=200)
+
+# Pulsante per valutare
 if st.button("Valuta"):
-    with st.spinner("Sto valutando la tua idea..."):
-        prompt = f"""Valuta questa idea di business: "{idea}"
+    if not idea:
+        st.error("Per favore, inserisci un'idea di startup.")
+    else:
+        with st.spinner("Sto valutando la tua idea..."):
+            try:
+                # Prompt per l'AI
+                prompt = f"""Valuta questa idea di business: "{idea}"
 
-Rispondi con:
-- Punti forti
-- Punti deboli
-- Potenziale di impatto"""
+Rispondi in italiano con:
+- **Punti forti**
+- **Punti deboli**
+- **Potenziale di impatto**"""
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
+                # Chiamata all'API di OpenAI
+                response = client.chat.completions.create(
+                    model="gpt-4o",  # Usa un modello disponibile, come gpt-4o
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=500
+                )
 
-        valutazione = response.choices[0].message["content"]
-        st.markdown("### Risultato:")
-        st.markdown(f"```text\n{valutazione}\n```")
-
+                # Estrai la risposta
+                valutazione = response.choices[0].message.content
+                st.markdown("### Risultato della valutazione:")
+                st.markdown(f"```text\n{valutazione}\n```")
+            except Exception as e:
+                st.error(f"Errore durante la valutazione: {str(e)}. Verifica la tua API key o la connessione.")
