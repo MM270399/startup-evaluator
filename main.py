@@ -3,7 +3,10 @@ import os
 from openai import OpenAI
 
 # Configura la chiave API di OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url="https://api.openai.com/v1",
+)
 
 # Configura la pagina
 st.set_page_config(page_title="Valutatore Startup AI", layout="wide")
@@ -34,7 +37,7 @@ Rispondi in italiano con:
 
                 # Chiamata all'API di OpenAI
                 response = client.chat.completions.create(
-                    model="gpt-4o",  # Usa un modello disponibile, come gpt-4o
+                    model="gpt-3.5-turbo",  # Cambiato a gpt-3.5-turbo per maggiore accessibilità
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=500
                 )
