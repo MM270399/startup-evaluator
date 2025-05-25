@@ -1,53 +1,48 @@
 import streamlit as st
 
-st.set_page_config(page_title="⏳ Calcolatore di Vita Spesa")
+st.set_page_config(page_title="Quanto della tua vita sprechi?", page_icon="⏳")
 
-st.title("⏳ Quanto della tua vita hai già 'speso'?")
+st.title("⏳ Quanto della tua vita sprechi?")
+st.write("Inserisci quante ore al giorno dedichi a ciascuna attività. L'app calcolerà quanti anni della tua vita vengono spesi in quelle attività.")
 
-eta = st.slider("Quanti anni hai?", 10, 100, 30)
-aspettativa = st.slider("Aspettativa di vita (in anni)", 50, 120, 85)
+# Input utente
+età = st.slider("🎂 La tua età attuale", 10, 100, 30)
+dormire = st.slider("😴 Ore al giorno dedicate a dormire", 0.0, 24.0, 8.0, 0.5)
+lavorare = st.slider("💼 Ore al giorno lavorando/studiando", 0.0, 24.0, 8.0, 0.5)
+mangiare = st.slider("🍽️ Ore al giorno mangiando", 0.0, 24.0, 1.5, 0.5)
+social = st.slider("📱 Ore al giorno su social / TV", 0.0, 24.0, 2.0, 0.5)
+trasporti = st.slider("🚗 Ore al giorno in trasporti / attese", 0.0, 24.0, 1.0, 0.5)
 
-st.markdown("### Ore al giorno dedicate a:")
-dormire = st.slider("😴 Dormire", 0.0, 12.0, 8.0)
-lavorare = st.slider("💼 Lavorare/studiare", 0.0, 12.0, 8.0)
-mangiare = st.slider("🍽️ Mangiare", 0.0, 4.0, 1.5)
-social = st.slider("📱 Social media / TV", 0.0, 8.0, 2.0)
-trasporti = st.slider("🚗 Trasporti / attese", 0.0, 6.0, 1.0)
+# Funzione di calcolo
+def ore_giornaliere_in_anni(ore):
+    giorni_in_anno = 365.25
+    return round((ore * giorni_in_anno) / 24, 1)
 
-# Calcoli
-anni_tot = aspettativa
-anni_trascorsi = eta
-anni_restanti = anni_tot - eta
-
-def ore_giornaliere_in_anni(ore_giorno):
-    return round(ore_giorno * 365.25 * anni_tot / 24, 1)
-
-st.markdown("---")
-
+# Output
 st.subheader("📊 Risultati:")
 
-st.write(f"**Hai già vissuto:** {anni_trascorsi} anni")
-st.write(f"**Ti restano (statisticamente):** {anni_restanti} anni")
-
-st.markdown("### Tempo totale speso in vita:")
 st.write(f"😴 Dormendo: {ore_giornaliere_in_anni(dormire)} anni")
 st.write(f"💼 Lavorando/studiando: {ore_giornaliere_in_anni(lavorare)} anni")
 st.write(f"🍽️ Mangiando: {ore_giornaliere_in_anni(mangiare)} anni")
 st.write(f"📱 Sui social / TV: {ore_giornaliere_in_anni(social)} anni")
-st.write(f"🚗 In trasporti / attese: {ore_giornari_in_anni(trasporti)} anni")
+st.write(f"🚗 In trasporti / attese: {ore_giornaliere_in_anni(trasporti)} anni")
 
 anni_spesi = sum([
     ore_giornaliere_in_anni(dormire),
-    ore_giornari_in_anni(lavorare),
-    ore_giornari_in_anni(mangiare),
-    ore_giornari_in_anni(social),
-    ore_giornari_in_anni(trasporti)
+    ore_giornaliere_in_anni(lavorare),
+    ore_giornaliere_in_anni(mangiare),
+    ore_giornaliere_in_anni(social),
+    ore_giornaliere_in_anni(trasporti)
 ])
 
-anni_liberi = round(anni_tot - anni_spesi, 1)
+st.markdown("---")
+st.write(f"🧮 **Anni totali spesi in queste attività**: **{anni_spesi} anni**")
 
-st.markdown("### ⏱️ Tempo VERAMENTE LIBERO nella vita:")
-st.success(f"🧘 {anni_liberi} anni")
+if anni_spesi >= età:
+    st.error("😱 Hai speso più anni di quanti ne hai vissuti! Ricontrolla i numeri.")
+else:
+    percentuale = round((anni_spesi / età) * 100, 1)
+    st.success(f"📉 Hai speso circa **{percentuale}%** della tua vita in queste attività.")
 
-st.caption("⚠️ Basato su dati medi. L'obiettivo non è deprimere... ma svegliare.")
-
+st.markdown("---")
+st.markdown("🔗 Creato con ❤️ da Massimiliano")
